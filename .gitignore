@@ -1,0 +1,27 @@
+# dbt
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# Datos de origen y convertidos: no se suben al repositorio.
+# Solo se versiona data/README.md (URLs, fecha de descarga y huellas SHA-256).
+data/*
+!data/README.md
+
+# Claves y credenciales
+*.p8
+*.pem
+*.key
+.env
+profiles.yml
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Ficheros temporales del sistema y de Excel
+.DS_Store
+Thumbs.db
+~$*
