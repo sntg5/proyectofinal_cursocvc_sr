@@ -47,3 +47,10 @@ data_tests:
       Total del INE. Si falla, el INE ha cambiado una etiqueta de tipo o falta
       el total de un mes; revisar las equivalencias de slv_tipo_vivienda y las
       filas guardadas en dbt_jobs.
+
+  - name: assert_snapshot_una_version_vigente
+    description: >
+      Cada provincia, mes y tipo de vivienda tiene exactamente una versión
+      vigente (dbt_valid_to NULL) en snp_compraventa_vivienda. Si falla con 0,
+      ejecutar el snapshot; si falla con 2 o más, revisar la unique_key del
+      snapshot o si hay duplicados en slv_compraventa_vivienda_mensual.
