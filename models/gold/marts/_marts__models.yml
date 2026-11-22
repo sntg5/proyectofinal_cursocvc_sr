@@ -144,3 +144,73 @@ models:
                 min_value: 1
                 max_value: 50
               description: Hay 50 provincias. Si falla, revisar la partición del RANK por grupo y año.
+
+  - name: mart_pandemia
+    description: >
+      Caso 2, la pandemia, caída y rebote del suelo y la vivienda. Una fila por
+      territorio y mes en 2 niveles (Provincia y España): 4.896 filas. El suelo
+      solo tiene valor en el primer mes de cada trimestre. El nivel se filtra
+      siempre.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['nivel', 'id_territorio', 'id_mes']
+          description: Una fila por nivel, territorio y mes. Si falla, revisar los GROUPING SETS.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "(MOD(id_mes, 100) IN (1, 4, 7, 10)) = (num_transacciones_suelo IS NOT NULL)"
+          description: >
+            El suelo tiene valor en el primer mes de cada trimestre y solo en él.
+            Si falla, revisar el cruce con fct_suelo_trimestral por id_mes.
+    columns:
+      - name: nivel
+        description: Provincia o España.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Provincia', 'España']
+              description: Solo existen los 2 niveles del diseño. Si falla, revisar el CASE con GROUPING.
+      - name: id_territorio
+        description: Código INE de la provincia, o ES para España.
+        data_tests:
+          - not_null:
+              description: Si falla, revisar el COALESCE de id_territorio.
+      - name: territorio
+        description: Nombre del territorio para mostrar.
+      - name: id_ccaa
+        description: CCAA de la provincia, para filtrar (vacío en el nivel España).
+      - name: id_mes
+        description: Mes (AAAAMM).
+      - name: fecha_inicio_mes
+        description: Día 1 del mes, eje de tiempo continuo en Power BI.
+      - name: id_trimestre
+        description: Trimestre del mes (AAAAT), para ordenar etiqueta_trimestre.
+      - name: etiqueta_trimestre
+        description: Etiqueta del trimestre (2020-T2) para el eje del suelo.
+      - name: anio
+        description: Año.
+      - name: id_etapa
+        description: Código de la etapa (PRE, PAN, REC o POS).
+      - name: etapa
+        description: Nombre de la etapa, para sombrear los gráficos.
+      - name: orden_etapa
+        description: Orden de la etapa, para "Ordenar por columna" en Power BI.
+      - name: num_transacciones_suelo
+        description: Compraventas de suelo del trimestre (solo en su primer mes; aditiva).
+      - name: transacciones_con_precio
+        description: Denominador del precio medio ponderado (aditiva).
+      - name: precio_x_transacciones
+        description: Numerador del precio medio ponderado (aditiva).
+      - name: precio_medio
+        description: Precio medio del m² de suelo ponderado por las transacciones con precio.
+      - name: variacion_interanual_precio
+        description: Variación del precio medio frente al mismo trimestre del año anterior.
+      - name: variacion_interanual_transacciones_suelo
+        description: Variación de las compraventas de suelo frente al mismo trimestre del año anterior.
+      - name: num_compraventas_vivienda
+        description: Compraventas de vivienda del mes (libre + protegida; aditiva).
+        data_tests:
+          - not_null:
+              description: Hay compraventas de vivienda todos los meses. Si falla, revisar el cruce con fct_compraventa_vivienda_mensual.
+      - name: variacion_interanual_compraventas_vivienda
+        description: Variación de las compraventas de vivienda frente al mismo mes del año anterior.
