@@ -3,6 +3,7 @@
 # =============================================================================
 # dim_lugar y dim_tiempo son dimensiones conformadas: las comparten los 3
 # hechos, así que un filtro de CCAA o de etapa afecta a todo el informe.
+# dim_grupo_ipc solo la usa fct_ipc_mensual (caso 4).
 # =============================================================================
 
 models:
@@ -130,3 +131,41 @@ models:
                 min_value: 1
                 max_value: 4
               description: Va de 1 a 4. Si falla, revisar slv_etapa.
+
+  - name: dim_grupo_ipc
+    description: >
+      Una fila por grupo de gasto del IPC (13): el Índice general (00) y los 12
+      grupos ECOICOP. Solo la usa fct_ipc_mensual.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "es_indice_general = (id_grupo = '00')"
+          description: Solo el grupo 00 es el Índice general. Si falla, revisar es_indice_general en slv_grupo_ipc.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "es_grupo_vivienda = (id_grupo = '04')"
+          description: Solo el grupo 04 es el de vivienda. Si falla, revisar el cálculo de es_grupo_vivienda.
+    columns:
+      - name: sk_grupo_ipc
+        description: Clave subrogada (generate_surrogate_key del código ECOICOP).
+        data_tests:
+          - unique:
+              description: PK. Si falla, revisar el cálculo de generate_surrogate_key.
+          - not_null:
+              description: PK. Si falla, revisar el cálculo de generate_surrogate_key.
+      - name: id_grupo
+        description: Código ECOICOP (00 = Índice general), conservado como atributo.
+        data_tests:
+          - unique:
+              description: Si falla, un grupo tiene dos nombres; revisar slv_grupo_ipc.
+          - not_null:
+              description: Si falla, revisar slv_grupo_ipc.
+      - name: nombre_grupo
+        description: Nombre del grupo de gasto tal como lo publica el INE.
+        data_tests:
+          - not_null:
+              description: Si falla, revisar slv_grupo_ipc.
+      - name: es_indice_general
+        description: TRUE solo en la cesta completa (00). Las barras por grupo lo excluyen.
+      - name: es_grupo_vivienda
+        description: TRUE solo en el grupo 04, vivienda (alquiler y suministros, no la compra).
