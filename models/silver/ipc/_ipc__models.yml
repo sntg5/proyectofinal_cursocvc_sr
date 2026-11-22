@@ -1,0 +1,41 @@
+# =============================================================================
+# Silver · IPC: grupos de gasto y su tabla de medidas
+# =============================================================================
+# slv_grupo_ipc sale de los datos del INE; slv_ipc_mensual resuelve la
+# relación ternaria provincia × mes × grupo. Los tipos los fija el CAST.
+# =============================================================================
+
+models:
+  - name: slv_grupo_ipc
+    description: Una fila por grupo de gasto del IPC (13).
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "es_indice_general = (id_grupo = '00')"
+          description: Solo el grupo 00 es el Índice general. Si falla, revisa el CAST de es_indice_general.
+    columns:
+      - name: id_grupo
+        description: Código ECOICOP; 00 = Índice general (cesta completa).
+        data_tests:
+          - unique:
+              description: >
+                PK. Si falla, un grupo tiene dos nombres distintos en el INE:
+                revisa separar_codigo_nombre o un cambio de etiqueta del INE.
+          - not_null:
+              description: PK. Si falla, revisa el COALESCE a '00' de int_ine__ipc_mensual_1fn.
+          - accepted_values:
+              arguments:
+                values: ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+              description: Solo existen el 00 y los 12 grupos ECOICOP. Si falla, el INE ha añadido o cambiado un grupo.
+      - name: nombre_grupo
+        description: Nombre del grupo tal como lo publica el INE.
+        data_tests:
+          - unique:
+              description: "Si falla, dos códigos tienen el mismo nombre: revisa separar_codigo_nombre."
+          - not_null:
+              description: Si falla, un grupo ha quedado sin nombre al separar código y nombre.
+      - name: es_indice_general
+        description: TRUE solo para la cesta completa.
+        data_tests:
+          - not_null:
+              description: Si falla, revisa el cálculo de es_indice_general.
