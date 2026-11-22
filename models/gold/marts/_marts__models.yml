@@ -1,0 +1,82 @@
+# =============================================================================
+# Gold · Data Mart: una vista por caso de uso
+# =============================================================================
+# Cada mart lleva sus propias columnas de territorio y tiempo (en Power BI se
+# usa solo, sin relacionarlo con las dimensiones) y guarda numerador y
+# denominador junto a cada ratio.
+# =============================================================================
+
+models:
+  - name: mart_suelo_vs_ipc
+    description: >
+      Caso 1, ¿el suelo sube más que el coste de vida? Una fila por territorio
+      y año en 4 niveles (Provincia, CCAA, Zona y España): 560 filas. El nivel
+      se filtra siempre, porque los códigos de provincia y de CCAA se repiten
+      (09 es Burgos y también Cataluña).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['nivel', 'id_territorio', 'anio']
+          description: Una fila por nivel, territorio y año. Si falla, revisar los GROUPING SETS.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "(anio = {{ var('anio_base') }}) = (es_buena_compra IS NULL)"
+          description: Buena Compra es NULL solo en el año base. Si falla, revisar el cálculo de es_buena_compra.
+    columns:
+      - name: nivel
+        description: Provincia, CCAA, Zona o España.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Provincia', 'CCAA', 'Zona', 'España']
+              description: Solo existen los 4 niveles del diseño. Si falla, revisar el CASE con GROUPING.
+      - name: id_territorio
+        description: Código del territorio en su nivel (código INE de provincia o CCAA, NOR o SUR, ES).
+        data_tests:
+          - not_null:
+              description: Si falla, revisar el COALESCE de id_territorio.
+      - name: territorio
+        description: Nombre del territorio para mostrar.
+      - name: id_ccaa
+        description: CCAA del territorio (vacío en los niveles Zona y España).
+      - name: zona
+        description: Zona del territorio (vacía en el nivel España).
+      - name: anio
+        description: Año.
+      - name: id_etapa
+        description: Etapa del año.
+      - name: transacciones_con_precio
+        description: Denominador de las medias ponderadas (aditiva).
+      - name: precio_x_transacciones
+        description: Numerador del precio medio ponderado (aditiva).
+      - name: hipotetico_x_transacciones
+        description: Numerador del precio hipotético ponderado (aditiva).
+      - name: precio_medio
+        description: Precio medio del m² ponderado por las transacciones con precio.
+        data_tests:
+          - not_null:
+              description: Todos los territorios tienen precio cada año. Si falla, revisar transacciones_con_precio en el hecho.
+      - name: precio_hipotetico
+        description: Precio hipotético ponderado con los mismos pesos que el precio real.
+        data_tests:
+          - not_null:
+              description: Si falla, revisar precio_hipotetico en el hecho.
+      - name: diferencia
+        description: precio_medio − precio_hipotetico. Negativa = el suelo va por detrás del coste de vida.
+      - name: variacion_precio_vs_2018
+        description: Subida del precio medio frente al año base.
+      - name: variacion_ipc_vs_2018
+        description: >
+          Subida del precio hipotético frente al año base. En provincia sigue al
+          IPC provincial; por encima, es el coste de vida ponderado por
+          compraventas de suelo (no el IPC oficial de la CCAA).
+      - name: variacion_real_vs_2018
+        description: Variación del precio descontada la del coste de vida.
+      - name: variacion_interanual_precio
+        description: Variación del precio medio frente al año anterior.
+      - name: es_buena_compra
+        description: KPI principal. TRUE si el precio medio es menor que el hipotético. NULL en el año base.
+      - name: es_buena_venta
+        description: KPI secundario. TRUE si la diferencia mejora respecto al año anterior. NULL en el año base.
+      - name: trimestres_poco_fiables
+        description: Trimestres de provincia con menos compraventas que el umbral de fiabilidad.
