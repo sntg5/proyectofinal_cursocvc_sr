@@ -29,28 +29,22 @@ seeds:
             expression: "(id_zona = 'NOR' AND nombre_zona = 'Norte') OR (id_zona = 'SUR' AND nombre_zona = 'Sur')"
           description: >
             El código y el nombre de la zona coinciden en cada fila. Si falla,
-            hay una fila con la zona mal escrita en el CSV: corrígela.
+            corregir la zona de esa fila en el CSV.
     columns:
       - name: id_provincia
         description: Código oficial de la provincia en el INE (01-50), como texto.
         data_tests:
           - unique:
-              description: >
-                Cada provincia aparece una sola vez. Si falla, hay una fila
-                repetida en el CSV: bórrala.
+              description: Cada provincia aparece una sola vez. Si falla, eliminar la fila repetida del CSV.
           - not_null:
-              description: >
-                Todas las filas tienen código. Si falla, hay una fila vacía o
-                incompleta en el CSV.
+              description: Todas las filas tienen código. Si falla, completar la fila vacía o incompleta del CSV.
       - name: nombre_provincia
         description: Nombre oficial en orden natural (para mostrar y para los mapas).
         data_tests:
           - unique:
-              description: >
-                No hay dos provincias con el mismo nombre. Si falla, revisa el
-                nombre repetido en el CSV.
+              description: No hay dos provincias con el mismo nombre. Si falla, corregir el nombre repetido en el CSV.
           - not_null:
-              description: Todas las provincias tienen nombre. Si falla, complétalo en el CSV.
+              description: Todas las provincias tienen nombre. Si falla, completarlo en el CSV.
       - name: nombre_mivau
         description: >
           Nombre exacto en los Excel del ministerio, sin espacios finales. Es la
@@ -59,37 +53,35 @@ seeds:
           - unique:
               description: >
                 Cada nombre del ministerio corresponde a una sola provincia. Si
-                falla, el cruce con el MIVAU duplicaría filas: corrige el CSV.
+                falla, corregir el CSV, porque el cruce con el MIVAU duplicaría filas.
           - not_null:
               description: >
                 Todas las provincias tienen su nombre del ministerio. Si falla,
-                esa provincia no cruzaría con el MIVAU.
+                completarlo en el CSV, porque esa provincia no cruzaría con el MIVAU.
       - name: id_ccaa
         description: Código oficial de la comunidad autónoma en el INE (01-17), como texto.
         data_tests:
           - not_null:
-              description: Todas las provincias tienen CCAA. Si falla, complétala en el CSV.
+              description: Todas las provincias tienen CCAA. Si falla, completarla en el CSV.
       - name: nombre_ccaa
         description: Nombre oficial de la comunidad autónoma en orden natural.
         data_tests:
           - not_null:
-              description: Todas las provincias tienen nombre de CCAA. Si falla, complétalo en el CSV.
+              description: Todas las provincias tienen nombre de CCAA. Si falla, completarlo en el CSV.
       - name: id_zona
         description: Código de la zona (NOR o SUR), agrupación de CCAA de la Práctica 2.
         data_tests:
           - not_null:
-              description: Todas las provincias tienen zona. Si falla, complétala en el CSV.
+              description: Todas las provincias tienen zona. Si falla, completarla en el CSV.
           - accepted_values:
               arguments:
                 values: ['NOR', 'SUR']
-              description: >
-                Solo existen las zonas NOR y SUR. Si falla, hay un código mal
-                escrito en el CSV.
+              description: Solo existen las zonas NOR y SUR. Si falla, corregir el código en el CSV.
       - name: nombre_zona
         description: Nombre de la zona (Norte o Sur).
         data_tests:
           - not_null:
-              description: Todas las provincias tienen nombre de zona. Si falla, complétalo en el CSV.
+              description: Todas las provincias tienen nombre de zona. Si falla, completarlo en el CSV.
 
   - name: seed_etapas
     description: >
@@ -107,51 +99,49 @@ seeds:
       - dbt_utils.expression_is_true:
           arguments:
             expression: "anio_desde <= anio_hasta"
-          description: >
-            Cada etapa empieza antes de terminar. Si falla, los años de una
-            etapa están al revés en el CSV.
+          description: Cada etapa empieza antes de terminar. Si falla, corregir los años de la etapa en el CSV.
     columns:
       - name: id_etapa
         description: Código de la etapa.
         data_tests:
           - unique:
-              description: Cada etapa aparece una sola vez. Si falla, borra la fila repetida del CSV.
+              description: Cada etapa aparece una sola vez. Si falla, eliminar la fila repetida del CSV.
           - not_null:
-              description: Todas las etapas tienen código. Si falla, complétalo en el CSV.
+              description: Todas las etapas tienen código. Si falla, completarlo en el CSV.
           - accepted_values:
               arguments:
                 values: ['PRE', 'PAN', 'REC', 'POS']
               description: >
-                Solo existen las 4 etapas del diseño. Si falla, hay un código mal
-                escrito o una etapa nueva que no está en el diseño.
+                Solo existen las 4 etapas del diseño. Si falla, corregir el código
+                o comprobar si la etapa nueva está recogida en el diseño.
       - name: nombre_etapa
         description: Prepandemia, Pandemia, Recuperación o Pospandemia.
         data_tests:
           - unique:
-              description: No hay dos etapas con el mismo nombre. Si falla, corrige el CSV.
+              description: No hay dos etapas con el mismo nombre. Si falla, corregir el CSV.
           - not_null:
-              description: Todas las etapas tienen nombre. Si falla, complétalo en el CSV.
+              description: Todas las etapas tienen nombre. Si falla, completarlo en el CSV.
       - name: descripcion
         description: Qué periodo cubre la etapa.
       - name: orden_etapa
         description: Orden cronológico de la etapa, para ordenar los gráficos.
         data_tests:
           - unique:
-              description: Cada etapa tiene un orden distinto. Si falla, hay dos etapas con el mismo número.
+              description: Cada etapa tiene un orden distinto. Si falla, corregir el número repetido en el CSV.
           - not_null:
-              description: Todas las etapas tienen orden. Si falla, complétalo en el CSV.
+              description: Todas las etapas tienen orden. Si falla, completarlo en el CSV.
           - dbt_utils.accepted_range:
               arguments:
                 min_value: 1
                 max_value: 4
-              description: El orden va de 1 a 4. Si falla, corrige el número en el CSV.
+              description: El orden va de 1 a 4. Si falla, corregir el número en el CSV.
       - name: anio_desde
         description: Primer año de la etapa.
         data_tests:
           - not_null:
-              description: Todas las etapas tienen año de inicio. Si falla, complétalo en el CSV.
+              description: Todas las etapas tienen año de inicio. Si falla, completarlo en el CSV.
       - name: anio_hasta
         description: Último año de la etapa.
         data_tests:
           - not_null:
-              description: Todas las etapas tienen año de fin. Si falla, complétalo en el CSV.
+              description: Todas las etapas tienen año de fin. Si falla, completarlo en el CSV.

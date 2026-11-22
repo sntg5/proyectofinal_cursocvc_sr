@@ -27,12 +27,12 @@ sources:
             description: Código INE y nombre en el mismo campo (`01 Araba/Álava`), o `Nacional`.
             data_tests:
               - not_null:
-                  description: Toda fila tiene territorio. Si falla, el CSV viene con otro formato.
+                  description: Toda fila tiene territorio. Si falla, comprobar si el CSV viene con otro formato.
           - name: grupos_ecoicop
             description: Código y nombre del grupo (`04 Vivienda, agua…`); `Índice general` no trae código.
             data_tests:
               - not_null:
-                  description: Toda fila tiene grupo. Si falla, el CSV viene con otro formato.
+                  description: Toda fila tiene grupo. Si falla, comprobar si el CSV viene con otro formato.
           - name: tipo_de_dato
             description: Qué significa la columna total en esa fila (índice o una de 3 variaciones).
             data_tests:
@@ -42,26 +42,26 @@ sources:
                   description: >
                     Solo hay estos 4 tipos de dato. Si falla, el INE ha cambiado
                     una etiqueta y el filtro de 'Índice' en int_ine__ipc_mensual_1fn
-                    perdería filas: actualiza el filtro.
+                    perdería filas; actualizar el filtro.
           - name: periodo
             description: Mes como texto (`2025M12`).
             data_tests:
               - not_null:
-                  description: Toda fila tiene periodo. Si falla, el CSV viene con otro formato.
+                  description: Toda fila tiene periodo. Si falla, comprobar si el CSV viene con otro formato.
           - name: total
             description: Valor con coma decimal (`119,942`).
             data_tests:
               - not_null:
                   description: >
-                    El fichero no trae huecos. Si falla, hay celdas vacías nuevas:
-                    revisa qué filas son antes de seguir.
+                    El fichero no trae huecos. Si falla, hay celdas vacías nuevas;
+                    identificar esas filas antes de seguir.
           - name: _fila
             description: Número de fila del fichero (1 = primera fila de datos).
             data_tests:
               - unique:
                   description: >
                     Cada fila se carga una vez. Si falla, el fichero se ha cargado
-                    dos veces sin TRUNCATE: vuelve a ejecutar la carga.
+                    dos veces sin TRUNCATE y hay que repetir la carga.
           - name: _loaded_at
             description: Momento de la carga en Bronze. Lo usa el freshness.
 
@@ -85,25 +85,25 @@ sources:
                     values: ['Viviendas: Total', 'Vivienda libre', 'Vivienda protegida', 'Vivienda nueva', 'Vivienda usada']
                   description: >
                     Solo hay estas 5 categorías. Si falla, el INE ha cambiado una
-                    etiqueta: revisa las equivalencias de slv_tipo_vivienda.
+                    etiqueta; revisar las equivalencias de slv_tipo_vivienda.
           - name: periodo
             description: Mes como texto (`2025M12`).
             data_tests:
               - not_null:
-                  description: Toda fila tiene periodo. Si falla, el CSV viene con otro formato.
+                  description: Toda fila tiene periodo. Si falla, comprobar si el CSV viene con otro formato.
           - name: total
             description: Número de compraventas con punto de miles (`54.548`).
             data_tests:
               - not_null:
                   description: >
-                    El fichero no trae huecos. Si falla, hay celdas vacías nuevas:
-                    revisa qué filas son antes de seguir.
+                    El fichero no trae huecos. Si falla, hay celdas vacías nuevas;
+                    identificar esas filas antes de seguir.
           - name: _fila
             description: Número de fila del fichero (1 = primera fila de datos).
             data_tests:
               - unique:
                   description: >
                     Cada fila se carga una vez. Si falla, el fichero se ha cargado
-                    dos veces sin TRUNCATE: vuelve a ejecutar la carga.
+                    dos veces sin TRUNCATE y hay que repetir la carga.
           - name: _loaded_at
             description: Momento de la carga en Bronze. Lo usa el freshness.

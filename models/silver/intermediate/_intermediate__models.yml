@@ -16,11 +16,9 @@ models:
         description: Clave AAAAMM (202005 = mayo de 2020).
         data_tests:
           - unique:
-              description: >
-                Cada mes aparece una vez. Si falla, revisa los argumentos de
-                date_spine.
+              description: Cada mes aparece una vez. Si falla, revisar los argumentos de date_spine.
           - not_null:
-              description: Todos los meses tienen clave. Si falla, revisa el cálculo de id_mes.
+              description: Todos los meses tienen clave. Si falla, revisar el cálculo de id_mes.
 
   - name: int_mivau__suelo_trimestral_1fn
     description: >
@@ -33,7 +31,7 @@ models:
           description: >
             Una sola fila por provincia y trimestre. Si falla, un nombre del
             ministerio cruza con dos provincias del seed o el unpivot repite una
-            columna: revisa nombre_mivau en el seed y la macro unpivot_trimestres.
+            columna; revisar nombre_mivau en el seed y la macro unpivot_trimestres.
 
   - name: int_ine__ipc_mensual_1fn
     description: >
@@ -45,5 +43,6 @@ models:
             combination_of_columns: ['id_provincia', 'id_mes', 'id_grupo']
           description: >
             Una sola fila por provincia, mes y grupo. Si falla, hay un grupo sin
-            código además del Índice general (los dos pasarían a '00'), o el
-            filtro de tipo_dato deja pasar variaciones.
+            código además del Índice general (los dos pasarían a '00') o el
+            filtro de tipo_dato deja pasar variaciones; revisar
+            separar_codigo_nombre y el filtro.

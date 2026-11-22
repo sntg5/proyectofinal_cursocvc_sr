@@ -32,16 +32,16 @@ sources:
             description: Fichero de origen de la carga.
             data_tests:
               - not_null:
-                  description: Toda fila sabe de qué fichero viene. Si falla, revisa SP_CARGAR_BRONZE.
+                  description: Toda fila indica de qué fichero viene. Si falla, revisar SP_CARGAR_BRONZE.
           - name: _fila
             description: Número de fila de Excel. Permite rastrear cada dato hasta su celda.
             data_tests:
               - unique:
                   description: >
                     Cada fila de la hoja se carga una vez. Si falla, el fichero se
-                    ha cargado dos veces sin TRUNCATE: vuelve a ejecutar la carga.
+                    ha cargado dos veces sin TRUNCATE y hay que repetir la carga.
               - not_null:
-                  description: Toda fila tiene número. Si falla, revisa el COPY INTO del procedimiento.
+                  description: Toda fila tiene número. Si falla, revisar el COPY INTO del procedimiento.
           - name: _loaded_at
             description: Momento de la carga en Bronze. Lo usa el freshness.
 
@@ -57,15 +57,15 @@ sources:
             description: Fichero de origen de la carga.
             data_tests:
               - not_null:
-                  description: Toda fila sabe de qué fichero viene. Si falla, revisa SP_CARGAR_BRONZE.
+                  description: Toda fila indica de qué fichero viene. Si falla, revisar SP_CARGAR_BRONZE.
           - name: _fila
             description: Número de fila de Excel. Permite rastrear cada dato hasta su celda.
             data_tests:
               - unique:
                   description: >
                     Cada fila de la hoja se carga una vez. Si falla, el fichero se
-                    ha cargado dos veces sin TRUNCATE: vuelve a ejecutar la carga.
+                    ha cargado dos veces sin TRUNCATE y hay que repetir la carga.
               - not_null:
-                  description: Toda fila tiene número. Si falla, revisa el COPY INTO del procedimiento.
+                  description: Toda fila tiene número. Si falla, revisar el COPY INTO del procedimiento.
           - name: _loaded_at
             description: Momento de la carga en Bronze. Lo usa el freshness.
