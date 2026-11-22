@@ -30,15 +30,16 @@ models:
               description: >
                 Todos los periodos se convierten a fecha. Si falla, el INE ha
                 cambiado el formato del periodo (antes '2025M12') y
-                FN_PERIODO_INE_A_FECHA no lo entiende: revisa la UDF.
+                FN_PERIODO_INE_A_FECHA no lo reconoce; revisar la UDF.
       - name: valor
         description: Índice o variación según tipo_dato, como número.
         data_tests:
           - not_null:
               description: >
                 Todos los valores se convierten a número. Si falla, hay un
-                marcador nuevo que FN_TEXTO_A_NUMERO no reconoce: mira las filas
-                guardadas en dbt_jobs, búscalas en Bronze por _fila y amplía la UDF.
+                marcador nuevo que FN_TEXTO_A_NUMERO no reconoce; consultar las
+                filas guardadas en dbt_jobs, localizarlas en Bronze por _fila y
+                ampliar la UDF.
               config:
                 store_failures: true
       - name: _fichero
@@ -69,15 +70,15 @@ models:
               description: >
                 Todos los periodos se convierten a fecha. Si falla, el INE ha
                 cambiado el formato del periodo y FN_PERIODO_INE_A_FECHA no lo
-                entiende: revisa la UDF.
+                reconoce; revisar la UDF.
       - name: num_compraventas
         description: Compraventas de viviendas inscritas en el mes.
         data_tests:
           - not_null:
               description: >
                 Todos los valores se convierten a número. Si falla, hay un
-                marcador nuevo que FN_TEXTO_A_NUMERO no reconoce: mira las filas
-                guardadas en dbt_jobs y amplía la UDF.
+                marcador nuevo que FN_TEXTO_A_NUMERO no reconoce; consultar las
+                filas guardadas en dbt_jobs y ampliar la UDF.
               config:
                 store_failures: true
           - dbt_utils.accepted_range:
@@ -85,7 +86,8 @@ models:
                 min_value: 0
               description: >
                 No hay compraventas negativas. Si falla, la conversión ha leído
-                mal el número (por ejemplo, un signo o un separador nuevo).
+                mal el número (un signo o un separador nuevo); revisar
+                FN_TEXTO_A_NUMERO.
       - name: _fichero
         description: Fichero de origen de la carga.
       - name: _loaded_at
