@@ -80,3 +80,67 @@ models:
         description: KPI secundario. TRUE si la diferencia mejora respecto al año anterior. NULL en el año base.
       - name: trimestres_poco_fiables
         description: Trimestres de provincia con menos compraventas que el umbral de fiabilidad.
+
+  - name: mart_coste_vida
+    description: >
+      Caso 4, ¿dónde y en qué ha subido más el coste de vida? Una fila por
+      provincia, grupo de gasto y año: 5.200 filas. Solo nivel provincia, porque
+      el IPC no se agrega sin las ponderaciones del INE. La cifra de España se
+      cita con el IPC Nacional del INE.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['id_provincia', 'id_grupo', 'anio']
+          description: Una fila por provincia, grupo y año. Si falla, revisar el GROUP BY de por_anio.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "(anio = {{ var('anio_base') }}) = (ranking_provincias IS NULL)"
+          description: El ranking es NULL solo en el año base. Si falla, revisar el cálculo de ranking_provincias.
+    columns:
+      - name: id_provincia
+        description: Código INE de la provincia.
+      - name: provincia
+        description: Nombre de la provincia en orden natural (categoría geográfica del mapa).
+      - name: id_ccaa
+        description: Código INE de la comunidad autónoma, para filtrar.
+      - name: ccaa
+        description: Nombre de la comunidad autónoma.
+      - name: zona
+        description: Norte o Sur.
+      - name: id_grupo
+        description: Código ECOICOP del grupo de gasto (00 = Índice general).
+      - name: nombre_grupo
+        description: Nombre del grupo de gasto.
+      - name: es_indice_general
+        description: TRUE en la cesta completa. El mapa la usa por defecto y las barras por grupo la excluyen.
+      - name: es_grupo_vivienda
+        description: TRUE en el grupo 04, vivienda (alquiler y suministros, no la compra).
+      - name: anio
+        description: Año.
+      - name: ipc_medio_anual
+        description: Media de los 12 índices mensuales del año (base 2021 = 100).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el índice de algún mes; revisar fct_ipc_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: false
+              description: Un índice es siempre positivo. Si falla, revisar fct_ipc_mensual.
+      - name: variacion_vs_2018
+        description: Subida acumulada del IPC medio frente al año base (0,211 = +21,1 %).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el año base de esa provincia y grupo; revisar el filtro de años de Silver.
+      - name: variacion_interanual
+        description: Variación del IPC medio frente al año anterior; NULL en el primer año.
+      - name: ranking_provincias
+        description: >
+          Posición de la provincia por la subida acumulada frente al año base,
+          dentro de cada grupo y año (1 = la que más sube). NULL en el año base.
+        data_tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+                max_value: 50
+              description: Hay 50 provincias. Si falla, revisar la partición del RANK por grupo y año.
