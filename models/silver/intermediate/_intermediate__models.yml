@@ -46,3 +46,16 @@ models:
             código además del Índice general (los dos pasarían a '00') o el
             filtro de tipo_dato deja pasar variaciones; revisar
             separar_codigo_nombre y el filtro.
+
+  - name: int_ine__compraventa_vivienda_1fn
+    description: >
+      Una fila por provincia, mes y tipo de vivienda con las compraventas de la
+      tabla 6150 del INE, sin el total. 50 provincias × 96 meses × 4 tipos.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['id_provincia', 'id_mes', 'id_tipo_vivienda']
+          description: >
+            Una sola fila por provincia, mes y tipo. Si falla, se cuelan filas de
+            CCAA o de nación, o dos etiquetas del INE reciben el mismo código;
+            revisar el filtro de provincia_ine y los CASE de id_tipo_vivienda.

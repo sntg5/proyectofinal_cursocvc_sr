@@ -162,3 +162,84 @@ models:
                 min_value: 0
                 inclusive: false
               description: Un índice es siempre positivo. Si falla, revisar slv_ipc_mensual.
+
+  - name: fct_compraventa_vivienda_mensual
+    description: >
+      Una provincia en un mes (4.800 filas), con una columna por tipo de
+      vivienda y el total. Solo se suman tipos del mismo criterio.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['sk_lugar', 'id_mes']
+          description: Grano provincia × mes. Si falla, revisar el GROUP BY del CTE compraventas.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "num_total = num_nueva + num_usada"
+          description: >
+            Los dos repartos dan el mismo total (libre + protegida = nueva +
+            usada). Si falla, revisar el bucle de tipos y el test de coherencia
+            de Silver.
+    columns:
+      - name: sk_lugar
+        description: Provincia (FK a dim_lugar).
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisar el cálculo de sk_lugar.
+          - relationships:
+              arguments:
+                to: ref('dim_lugar')
+                field: sk_lugar
+              description: FK. Si falla, sk_lugar no se calcula igual que en dim_lugar; revisar generate_surrogate_key.
+      - name: id_mes
+        description: Mes (FK a dim_tiempo).
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisar slv_compraventa_vivienda_mensual.
+          - relationships:
+              arguments:
+                to: ref('dim_tiempo')
+                field: id_mes
+              description: FK. Si falla, hay un mes fuera del calendario; revisar slv_mes.
+      - name: num_libre
+        description: Compraventas de vivienda libre (aditiva).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el tipo en algún mes; revisar slv_compraventa_vivienda_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+              description: No hay compraventas negativas. Si falla, revisar slv_compraventa_vivienda_mensual.
+      - name: num_protegida
+        description: Compraventas de vivienda protegida (aditiva).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el tipo en algún mes; revisar slv_compraventa_vivienda_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+              description: No hay compraventas negativas. Si falla, revisar slv_compraventa_vivienda_mensual.
+      - name: num_nueva
+        description: Compraventas de vivienda nueva (aditiva).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el tipo en algún mes; revisar slv_compraventa_vivienda_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+              description: No hay compraventas negativas. Si falla, revisar slv_compraventa_vivienda_mensual.
+      - name: num_usada
+        description: Compraventas de vivienda usada (aditiva).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el tipo en algún mes; revisar slv_compraventa_vivienda_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+              description: No hay compraventas negativas. Si falla, revisar slv_compraventa_vivienda_mensual.
+      - name: num_total
+        description: Total de compraventas = libre + protegida (aditiva).
+        data_tests:
+          - not_null:
+              description: Si falla, revisar el cálculo de num_total.
+      - name: variacion_interanual_total
+        description: Variación del total frente al mismo mes del año anterior (0,35 = +35 %); NULL en el primer año.
