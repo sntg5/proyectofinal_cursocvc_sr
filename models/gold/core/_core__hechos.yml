@@ -111,3 +111,54 @@ models:
         data_tests:
           - not_null:
               description: Si falla, revisar el cálculo de es_fiable.
+
+  - name: fct_ipc_mensual
+    description: >
+      Un grupo de gasto en una provincia y un mes (62.400 filas). El índice no
+      es aditivo: no se suma ni se promedia entre provincias.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['sk_lugar', 'id_mes', 'sk_grupo_ipc']
+          description: Grano provincia × mes × grupo. Si falla, revisar el grano de slv_ipc_mensual.
+    columns:
+      - name: sk_lugar
+        description: Provincia (FK a dim_lugar).
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisar el cálculo de sk_lugar.
+          - relationships:
+              arguments:
+                to: ref('dim_lugar')
+                field: sk_lugar
+              description: FK. Si falla, sk_lugar no se calcula igual que en dim_lugar; revisar generate_surrogate_key.
+      - name: id_mes
+        description: Mes (FK a dim_tiempo).
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisar slv_ipc_mensual.
+          - relationships:
+              arguments:
+                to: ref('dim_tiempo')
+                field: id_mes
+              description: FK. Si falla, hay un mes fuera del calendario; revisar el filtro de años de int_ine__ipc_mensual_1fn.
+      - name: sk_grupo_ipc
+        description: Grupo de gasto (FK a dim_grupo_ipc).
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisar el cálculo de sk_grupo_ipc.
+          - relationships:
+              arguments:
+                to: ref('dim_grupo_ipc')
+                field: sk_grupo_ipc
+              description: FK. Si falla, sk_grupo_ipc no se calcula igual que en dim_grupo_ipc; revisar generate_surrogate_key.
+      - name: indice
+        description: Índice de precios de consumo, base 2021 = 100 (no aditivo).
+        data_tests:
+          - not_null:
+              description: Si falla, falta el índice de una provincia, mes o grupo; revisar slv_ipc_mensual.
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: false
+              description: Un índice es siempre positivo. Si falla, revisar slv_ipc_mensual.
