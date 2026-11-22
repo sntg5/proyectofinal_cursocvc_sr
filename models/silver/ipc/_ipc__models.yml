@@ -39,3 +39,56 @@ models:
         data_tests:
           - not_null:
               description: Si falla, revisa el cálculo de es_indice_general.
+              
+  - name: slv_ipc_mensual
+    description: Un grupo de gasto en una provincia y un mes (62.400 filas).
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['id_provincia', 'id_mes', 'id_grupo']
+          description: PK compuesta. Si falla, revisa int_ine__ipc_mensual_1fn.
+    columns:
+      - name: id_provincia
+        description: Provincia.
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisa slv_provincia.
+          - relationships:
+              arguments:
+                to: ref('slv_provincia')
+                field: id_provincia
+              description: FK. Si falla, hay una provincia que no existe en slv_provincia.
+      - name: id_mes
+        description: Mes.
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisa slv_mes.
+          - relationships:
+              arguments:
+                to: ref('slv_mes')
+                field: id_mes
+              description: FK. Si falla, hay un mes que no existe en slv_mes.
+      - name: id_grupo
+        description: Grupo de gasto.
+        data_tests:
+          - not_null:
+              description: FK. Si falla, revisa slv_grupo_ipc.
+          - relationships:
+              arguments:
+                to: ref('slv_grupo_ipc')
+                field: id_grupo
+              description: FK. Si falla, hay un grupo que no existe en slv_grupo_ipc.
+      - name: indice
+        description: Índice de precios de consumo, base 2021 = 100 (INE tabla 50918).
+        data_tests:
+          - not_null:
+              description: >
+                El INE publica todos los índices del periodo. Si falla, falta un
+                dato para una provincia, mes o grupo: mira las filas en dbt_jobs.
+              config:
+                store_failures: true
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                inclusive: false
+              description: Un índice es siempre positivo. Si falla, revisa la conversión de la coma decimal.

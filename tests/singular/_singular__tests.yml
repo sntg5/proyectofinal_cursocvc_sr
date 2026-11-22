@@ -1,0 +1,35 @@
+# =============================================================================
+# Tests singulares: qué comprueban y qué hacer si fallan
+# =============================================================================
+
+data_tests:
+  - name: assert_completitud_suelo_trimestral
+    description: >
+      Cada provincia tiene transacciones en los 32 trimestres. Si falla, falta
+      una provincia o un periodo: revisa el cruce con el seed (nombre_mivau con
+      un espacio o una tilde distintos) o el filtro de años.
+
+  - name: assert_completitud_ipc_mensual
+    description: >
+      Cada provincia y grupo tiene índice en los 96 meses. Si falla, revisa el
+      filtro de tipo_dato y el cruce por código de provincia en
+      int_ine__ipc_mensual_1fn.
+
+  - name: assert_conciliacion_transacciones_suelo
+    description: >
+      Suma de 50 provincias + Ceuta y Melilla = TOTAL NACIONAL de la tabla 1,
+      trimestre a trimestre. Si falla, hay una columna desplazada en el unpivot
+      por posición, una fila de nivel mal filtrada o ha cambiado la etiqueta del
+      total o de Ceuta y Melilla. Las filas que no cuadran están en dbt_jobs.
+
+  - name: assert_conciliacion_precio_suelo
+    description: >
+      La media ponderada de las 50 provincias queda a menos de ±3 % del TOTAL
+      NACIONAL de la tabla 4 (aviso). Si pasa de ±3 %, revisa los pesos o un
+      precio mal convertido (coma o punto).
+
+  - name: assert_precio_m2_nulos_esperados
+    description: >
+      Exactamente 3 precios nulos (Ávila y Soria 2T 2020, Ourense 2T 2024)
+      (aviso). Si cambia, hay un 'n.s.' nuevo en el ministerio o falla
+      FN_TEXTO_A_NUMERO.
