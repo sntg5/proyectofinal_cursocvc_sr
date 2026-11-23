@@ -84,7 +84,7 @@ models:
                 inclusive: false
               description: Un índice es siempre positivo. Si falla, revisar slv_ipc_mensual.
       - name: precio_hipotetico
-        description: Precio si hubiera subido como el IPC desde el año base (no aditiva).
+        description: "{{ doc('precio_hipotetico') }}"
         data_tests:
           - not_null:
               description: Si falla, falta el precio base o el IPC del año base de la provincia; revisar valores_base.
@@ -107,7 +107,7 @@ models:
       - name: variacion_interanual
         description: Frente al mismo trimestre del año anterior (0,083 = +8,3 %); NULL en el primer año.
       - name: es_fiable
-        description: FALSE si hay menos compraventas que la var umbral_fiabilidad.
+        description: "{{ doc('fiabilidad') }}"
         data_tests:
           - not_null:
               description: Si falla, revisar el cálculo de es_fiable.
