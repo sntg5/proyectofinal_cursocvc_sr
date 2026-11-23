@@ -6,6 +6,7 @@
 -- Solo nivel provincia: el IPC no se agrega a CCAA, zona ni España porque el
 -- INE no publica las ponderaciones de cada provincia. La cifra de España se
 -- cita como referencia con el IPC Nacional del INE.
+-- - nombre_grupo_corto: rótulo corto del grupo, el mismo de dim_grupo_ipc.
 -- - ipc_medio_anual: media de los 12 índices mensuales del año.
 -- - variacion_vs_2018: subida acumulada frente al año base.
 -- - variacion_interanual: frente al año anterior (NULL en el primer año).
@@ -24,6 +25,7 @@ WITH base AS (
         lugar.zona,
         grupos.id_grupo,
         grupos.nombre_grupo,
+        grupos.nombre_grupo_corto,
         grupos.es_indice_general,
         grupos.es_grupo_vivienda,
         tiempo.anio,
@@ -48,6 +50,7 @@ por_anio AS (
         zona,
         id_grupo,
         nombre_grupo,
+        nombre_grupo_corto,
         es_indice_general,
         es_grupo_vivienda,
         anio,
@@ -61,6 +64,7 @@ por_anio AS (
         zona,
         id_grupo,
         nombre_grupo,
+        nombre_grupo_corto,
         es_indice_general,
         es_grupo_vivienda,
         anio
@@ -100,6 +104,7 @@ SELECT
     zona,
     id_grupo,
     nombre_grupo,
+    nombre_grupo_corto,
     es_indice_general,
     es_grupo_vivienda,
     anio,

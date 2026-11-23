@@ -111,6 +111,8 @@ models:
         description: Código ECOICOP del grupo de gasto (00 = Índice general).
       - name: nombre_grupo
         description: Nombre del grupo de gasto.
+      - name: nombre_grupo_corto
+        description: Rótulo corto del grupo para los gráficos, el mismo de dim_grupo_ipc.
       - name: es_indice_general
         description: TRUE en la cesta completa. El mapa la usa por defecto y las barras por grupo la excluyen.
       - name: es_grupo_vivienda

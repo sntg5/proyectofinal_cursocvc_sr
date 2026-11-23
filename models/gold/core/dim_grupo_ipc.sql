@@ -11,6 +11,10 @@
 --   mezclar el total con sus partes.
 -- - es_grupo_vivienda marca el grupo 04 (alquiler y suministros, no la compra
 --   de vivienda) para destacarlo en el caso 4 sin escribir el código a mano.
+-- - nombre_grupo_corto es el rótulo para los gráficos: el nombre del INE salvo
+--   en dos grupos de nombre largo. El 04 se rotula "Vivienda (alquiler y
+--   suministros)", para dejar claro que no incluye la compra de vivienda, y
+--   el 05 "Muebles y artículos del hogar". Silver conserva los nombres del INE.
 -- =============================================================================
 
 WITH grupos AS (
@@ -27,6 +31,13 @@ SELECT
     CAST({{ dbt_utils.generate_surrogate_key(['id_grupo']) }} AS VARCHAR(32)) AS sk_grupo_ipc,
     CAST(id_grupo AS VARCHAR(2)) AS id_grupo,
     CAST(nombre_grupo AS VARCHAR(100)) AS nombre_grupo,
+    CAST(
+        CASE id_grupo
+            WHEN '04' THEN 'Vivienda (alquiler y suministros)'
+            WHEN '05' THEN 'Muebles y artículos del hogar'
+            ELSE nombre_grupo
+        END AS VARCHAR(100)
+    ) AS nombre_grupo_corto,
     CAST(es_indice_general AS BOOLEAN) AS es_indice_general,
     CAST(id_grupo = '04' AS BOOLEAN) AS es_grupo_vivienda
 FROM grupos

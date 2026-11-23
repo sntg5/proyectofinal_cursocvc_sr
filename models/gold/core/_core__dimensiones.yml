@@ -165,6 +165,16 @@ models:
         data_tests:
           - not_null:
               description: Si falla, revisar slv_grupo_ipc.
+      - name: nombre_grupo_corto
+        description: >
+          Rótulo corto del grupo para los gráficos. Es el nombre del INE salvo en
+          el 04, "Vivienda (alquiler y suministros)", y en el 05, "Muebles y
+          artículos del hogar".
+        data_tests:
+          - unique:
+              description: Cada grupo tiene un rótulo distinto. Si falla, revisar el CASE de nombre_grupo_corto.
+          - not_null:
+              description: Todos los grupos tienen rótulo. Si falla, revisar el CASE de nombre_grupo_corto y slv_grupo_ipc.
       - name: es_indice_general
         description: TRUE solo en la cesta completa (00). Las barras por grupo lo excluyen.
       - name: es_grupo_vivienda
