@@ -24,7 +24,7 @@ models:
           description: Buena Compra es NULL solo en el año base. Si falla, revisar el cálculo de es_buena_compra.
     columns:
       - name: nivel
-        description: Provincia, CCAA, Zona o España.
+        description: "{{ doc('nivel_territorio') }}"
         data_tests:
           - accepted_values:
               arguments:
@@ -44,7 +44,7 @@ models:
       - name: anio
         description: Año.
       - name: id_etapa
-        description: Etapa del año.
+        description: "{{ doc('etapa') }}"
       - name: transacciones_con_precio
         description: Denominador de las medias ponderadas (aditiva).
       - name: precio_x_transacciones
@@ -56,11 +56,15 @@ models:
         data_tests:
           - not_null:
               description: Todos los territorios tienen precio cada año. Si falla, revisar transacciones_con_precio en el hecho.
+          - valores_positivos:
+              description: Un precio medio es siempre positivo. Si falla, revisar precio_x_transacciones en fct_suelo_trimestral.
       - name: precio_hipotetico
-        description: Precio hipotético ponderado con los mismos pesos que el precio real.
+        description: "{{ doc('precio_hipotetico') }}"
         data_tests:
           - not_null:
               description: Si falla, revisar precio_hipotetico en el hecho.
+          - valores_positivos:
+              description: Un precio hipotético es siempre positivo. Si falla, revisar precio_hipotetico y hipotetico_x_transacciones en fct_suelo_trimestral.
       - name: diferencia
         description: precio_medio − precio_hipotetico. Negativa = el suelo va por detrás del coste de vida.
       - name: variacion_precio_vs_2018
@@ -166,7 +170,7 @@ models:
             Si falla, revisar el cruce con fct_suelo_trimestral por id_mes.
     columns:
       - name: nivel
-        description: Provincia o España.
+        description: "{{ doc('nivel_territorio') }}"
         data_tests:
           - accepted_values:
               arguments:
@@ -194,7 +198,7 @@ models:
       - name: id_etapa
         description: Código de la etapa (PRE, PAN, REC o POS).
       - name: etapa
-        description: Nombre de la etapa, para sombrear los gráficos.
+        description: "{{ doc('etapa') }}"
       - name: orden_etapa
         description: Orden de la etapa, para "Ordenar por columna" en Power BI.
       - name: num_transacciones_suelo
@@ -204,7 +208,10 @@ models:
       - name: precio_x_transacciones
         description: Numerador del precio medio ponderado (aditiva).
       - name: precio_medio
-        description: Precio medio del m² de suelo ponderado por las transacciones con precio.
+        description: Precio medio del m² de suelo ponderado por las transacciones con precio (solo en el primer mes de cada trimestre).
+        data_tests:
+          - valores_positivos:
+              description: Un precio medio es siempre positivo. Si falla, revisar precio_x_transacciones en fct_suelo_trimestral.
       - name: variacion_interanual_precio
         description: Variación del precio medio frente al mismo trimestre del año anterior.
       - name: variacion_interanual_transacciones_suelo
@@ -230,7 +237,7 @@ models:
           description: Una fila por nivel, territorio y año. Si falla, revisar los GROUPING SETS.
     columns:
       - name: nivel
-        description: Provincia, CCAA, Zona o España.
+        description: "{{ doc('nivel_territorio') }}"
         data_tests:
           - accepted_values:
               arguments:
@@ -258,6 +265,8 @@ models:
         data_tests:
           - not_null:
               description: Todos los territorios tienen precio cada año. Si falla, revisar el cruce con suelo_anual.
+          - valores_positivos:
+              description: Un precio medio es siempre positivo. Si falla, revisar precio_x_transacciones en fct_suelo_trimestral.
       - name: ranking_precio
         description: Posición por precio medio dentro de cada nivel y año (1 = el más caro).
         data_tests:
