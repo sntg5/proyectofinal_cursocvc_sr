@@ -21,6 +21,18 @@ models:
           arguments:
             expression: "transacciones_con_precio = IFF(precio_m2 IS NULL, 0, num_transacciones)"
           description: El denominador excluye los trimestres sin precio. Si falla, revisar el cálculo de transacciones_con_precio.
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "es_fiable"
+          config:
+            warn_if: ">200"
+            error_if: ">400"
+          description: >
+            Umbrales de la marca de fiabilidad. Cuenta los trimestres poco fiables
+            (menos compraventas que umbral_fiabilidad); hoy son 169 de 1.600. Avisa
+            si pasan de 200 y da error si pasan de 400, una cuarta parte del total.
+            Si avisa o falla, revisar si faltan transacciones de la tabla 1 del MIVAU
+            (cruce con el seed o unpivot) antes de dar por buenos los precios medios.
     columns:
       - name: sk_lugar
         description: Provincia (FK a dim_lugar).
