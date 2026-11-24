@@ -45,7 +45,12 @@ models:
               description: Solo hay dos criterios. Si falla, revisar los CASE de int_ine__compraventa_vivienda_1fn.
 
   - name: slv_compraventa_vivienda_mensual
-    description: Un tipo de vivienda en una provincia y un mes (19.200 filas).
+    description: >
+      Un tipo de vivienda en una provincia y un mes (19.200 filas). Incremental
+      con estrategia merge y clave id_provincia, id_mes e id_tipo_vivienda: en
+      cada ejecución solo procesa la ventana de revisión, del último mes cargado
+      menos meses_revision (12) en adelante; actualiza los meses que el INE ha
+      corregido e inserta los nuevos. Con --full-refresh se reconstruye entera.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

@@ -41,6 +41,11 @@ vars:
   anio_base: 2018
   # Por debajo de este número de compraventas de suelo, el trimestre es poco fiable
   umbral_fiabilidad: 20
+  # Ventana de revisión de los modelos incrementales de vivienda: en cada
+  # ejecución se vuelven a procesar los últimos meses_revision meses ya
+  # cargados, porque el INE revisa sus datos provisionales cuando publica el
+  # mismo mes del año siguiente
+  meses_revision: 12
 
 # =============================================================================
 # Hooks de ejecución
@@ -71,8 +76,10 @@ models:
       +schema: staging
       +tags: ['staging']
 
-    # Silver: tablas 3FN (slv_), con carga completa en cada ejecución.
-    # En intermediate/ van las vistas de paso a 1FN (int_), en el mismo esquema.
+    # Silver: tablas 3FN (slv_), con carga completa en cada ejecución, salvo
+    # slv_compraventa_vivienda_mensual, que es incremental (merge) y lo indica
+    # en su config(). En intermediate/ van las vistas de paso a 1FN (int_), en
+    # el mismo esquema.
     silver:
       +materialized: table
       +database: "{{ env_var('DBT_SILVER_DB') }}"
@@ -81,7 +88,9 @@ models:
       intermediate:
         +materialized: view
 
-    # Gold: estrella (dim_ y fct_ como tablas) y Data Mart (mart_ como vistas)
+    # Gold: estrella (dim_ y fct_ como tablas, salvo fct_compraventa_vivienda_mensual,
+    # que es incremental con delete+insert y lo indica en su config()) y
+    # Data Mart (mart_ como vistas)
     gold:
       +database: "{{ env_var('DBT_GOLD_DB') }}"
       +tags: ['gold']
