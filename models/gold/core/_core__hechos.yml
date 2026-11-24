@@ -178,7 +178,12 @@ models:
   - name: fct_compraventa_vivienda_mensual
     description: >
       Una provincia en un mes (4.800 filas), con una columna por tipo de
-      vivienda y el total. Solo se suman tipos del mismo criterio.
+      vivienda y el total. Solo se suman tipos del mismo criterio. Incremental
+      con estrategia delete+insert y clave sk_lugar e id_mes (el grano): en cada
+      ejecución borra y vuelve a escribir los meses de la ventana de revisión,
+      del último mes cargado menos meses_revision (12) en adelante, recalculados
+      enteros. La variación interanual se calcula con toda la historia y la
+      ventana se filtra después. Con --full-refresh se reconstruye entera.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

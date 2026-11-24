@@ -24,3 +24,11 @@ analyses:
       Comprobación del efecto composición del caso 1. Compara la variación real
       de España del mart (pesos de cada año) con la de una cesta fija de 2018
       (pesos del año base), como hace el INE con el IPC.
+
+  - name: comprobacion_incremental
+    description: >
+      Estado de los dos modelos incrementales de vivienda: filas y último mes de
+      slv_compraventa_vivienda_mensual y de fct_compraventa_vivienda_mensual, y
+      compraventas de Madrid (libre, usada y total) de julio a diciembre de
+      2025. Se ejecuta antes y después de cargar una entrega nueva de la tabla
+      6150 del INE.

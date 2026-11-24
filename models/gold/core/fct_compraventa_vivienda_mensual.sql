@@ -15,7 +15,29 @@
 --   comprueba que también es nueva + usada.
 -- - variacion_interanual_total: frente al mismo mes del año anterior (NULL en
 --   el primer año del periodo). No aditiva.
+-- Incremental con estrategia delete+insert y clave sk_lugar e id_mes (el
+-- grano):
+-- - La primera vez (o con --full-refresh) se construye la tabla entera.
+-- - En las demás ejecuciones se recalculan enteros los meses de la ventana de
+--   revisión (macro ventana_revision): delete+insert borra las filas de esos
+--   meses que ya existen y vuelve a escribirlas, junto con las de los meses
+--   nuevos. Los meses anteriores a la ventana no se tocan.
+-- - La variación interanual se calcula con toda la historia de Silver y la
+--   ventana se filtra al final: si se filtrara antes, el LAG del primer año
+--   de la ventana no encontraría el mes del año anterior y saldría NULL.
+-- - on_schema_change='append_new_columns': si se añade una columna, dbt la
+--   crea en la tabla sin fallar; las filas anteriores a la ventana quedan con
+--   NULL hasta ejecutar con --full-refresh.
 -- =============================================================================
+
+{{
+    config(
+        materialized='incremental',
+        incremental_strategy='delete+insert',
+        unique_key=['sk_lugar', 'id_mes'],
+        on_schema_change='append_new_columns'
+    )
+}}
 
 {% set tipos_vivienda = ['LIBRE', 'PROTEGIDA', 'NUEVA', 'USADA'] %}
 
@@ -57,3 +79,6 @@ SELECT
     CAST(num_total AS NUMBER(9, 0)) AS num_total,
     CAST({{ variacion_pct('num_total', 'num_total_anio_anterior') }} AS NUMBER(9, 4)) AS variacion_interanual_total
 FROM calculos
+{%- if is_incremental() %}
+WHERE id_mes >= {{ ventana_revision(this) }}
+{%- endif %}
