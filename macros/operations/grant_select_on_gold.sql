@@ -7,9 +7,10 @@
    Por defecto (dry_run=true) solo escribe las sentencias en el log. Para
    ejecutarlas:
      dbt run-operation grant_select_on_gold --args '{role: REPORTING_ROLE, dry_run: false}'
-   Las tablas y vistas de Gold se recrean en cada dbt build (carga completa)
-   y pierden sus permisos, así que el job de PRO ejecuta esta macro después
-   del build.
+   Las tablas y vistas de Gold que se recrean en cada dbt build (carga
+   completa) pierden sus permisos, así que el job de PRO ejecuta esta macro
+   después del build. El hecho incremental de vivienda no se recrea y
+   conserva los suyos; volver a concederlos no cambia nada.
    El usage sobre la base de datos no se concede aquí: lo da el script de
    Snowflake 01_crear_entorno.sql, porque el rol de transformación no es
    propietario de la base y no puede concederlo.

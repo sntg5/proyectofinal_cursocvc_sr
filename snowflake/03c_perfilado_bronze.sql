@@ -3,7 +3,7 @@
 -- =============================================================================
 -- Consultas de solo lectura sobre las tablas raw de PRO_BRONZE_DB:
 --   1. Valores distintos por columna en las tablas del INE, frente al perfilado
---      de los ficheros (doc 00 §4.3 y §4.6), y lectura de las tildes (UTF-8).
+--      de los ficheros (data/README.md, §5), y lectura de las tildes (UTF-8).
 --   2. Celdas de los trimestres del ministerio (columnas C a CN): número de
 --      celdas, marcadores de "sin dato", ceros y máximo de decimales. Decide el
 --      tipo de precio_m2 en Silver.
