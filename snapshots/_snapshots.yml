@@ -2,9 +2,10 @@
 # Snapshots (SCD tipo 2) definidos en YAML
 # =============================================================================
 # snp_compraventa_vivienda guarda el historial de revisiones del INE: la tabla
-# 6150 publica los últimos meses como provisionales y luego los corrige. Con
-# carga completa, Bronze y Silver solo tienen la última entrega; el snapshot
-# guarda cada versión de un dato que cambia, con su periodo de validez
+# 6150 publica los últimos meses como provisionales y luego los corrige.
+# Bronze y Silver solo guardan el último valor publicado (Bronze sustituye el
+# fichero en cada carga y el incremental de Silver actualiza con merge); el
+# snapshot guarda cada versión de un dato que cambia, con su periodo de validez
 # (dbt_valid_from / dbt_valid_to). La versión vigente tiene dbt_valid_to NULL.
 # No es una dimensión que cambia: es el mecanismo SCD2 aplicado al dato
 # publicado que el origen corrige.
