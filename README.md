@@ -354,17 +354,13 @@ Todas en [`documentacion/img/`](documentacion/img/).
 | `04_objetos_snowflake.png` | Objetos creados en Snowflake |
 | `05_idempotencia_bronze.png` | Prueba de idempotencia de la carga de Bronze |
 | `06_linaje_dbt.png` y `06b_linaje_dbt.png` | Linaje de dbt, con la exposure y en la vista por defecto |
-| `07_job_pro_verde.png` | Job de PRO en verde |
 | `08_tests_verde.png` | Tests en verde |
 | `09_snapshot_versiones.png` | Historial de versiones del snapshot |
-| `10_entornos_dbt.png` | Entornos de dbt Platform |
-| `11_aviso_email_job.png` | Aviso por email de un job |
-| `12_gold_pro_reporting_role.png` | Gold de PRO leído con `REPORTING_ROLE` |
-| `13_jinja_compilado.png` | Jinja compilado: de 78 a 1.878 líneas |
 | `15_powerbi_modelo.png` | Vista de modelo de Power BI: la estrella y los marts aparte |
 | `16_powerbi_caso1.png` a `19_powerbi_caso4.png` | Las 4 páginas de casos de uso |
 | `20_idempotencia_dbt.png` | Ejecución sin cambios en la fuente: el snapshot no crea versiones |
 | `21_incremental_antes.png`, `22_incremental_despues.png` y `23_incremental_compilado.png` | Demo del incremental y SQL compilado con la ventana de revisión |
+
 
 ---
 
